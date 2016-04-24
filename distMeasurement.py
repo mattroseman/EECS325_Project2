@@ -23,13 +23,14 @@ def main():
         udp = socket.getprotobyname('udp')
         icmp = socket.getprotobyname('icmp')
         ttl = 32
+        port = 33434
 
         #  create the sending socket (udp packets)
         send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, udp)
         #  set the ttl of the socket
         send_sock.setsockopt(socket.SOL_IP, socket.IP_TTL, ttl)
         #  create the receiving socket (icmp packets)
-        recv_sock = socket.socket(socket.AF_INET, socket.SOCK_ICMP, icmp)
+        recv_sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
 
         recv_sock.bind(("", port))
         send_sock.sendto("", (dest_name, port))
