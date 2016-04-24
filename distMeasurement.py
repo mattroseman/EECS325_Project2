@@ -42,7 +42,7 @@ def main():
     ip_saddr = socket.inet_aton(source_ip)
     ip_daddr = socket.inet_aton(dest_ip)
 
-    ip_ihl_ver = (version << 4) + ihl
+    ip_ihl_ver = (ip_ver << 4) + ip_ihl
 
     ip_header = pack('!BBHHHBBH4s4s', ip_ihl_ver, ip_tos, ip_tot_len, ip_id,
                      ip_frag_off, ip_ttl, ip_proto, ip_check, ip_saddr, 
