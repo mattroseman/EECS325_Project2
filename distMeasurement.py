@@ -8,7 +8,7 @@ Code stolen from:
    "https://blogs.oracle.com/ksplice/entry/learning_by_doing_writing_your"
 """
 
-import socket, sys
+import socket, sys, time
 from struct import *
 
 def main():
@@ -33,14 +33,31 @@ def main():
         recv_sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
 
         recv_sock.bind(("", port))
+        #  used later to calculate RTT
+        time_sent = time.time()
         send_sock.sendto("", (dest_name, port))
 
         try:
-            _, resp_addr = recv_sock.recvfrom(512)
+            resp_data, resp_addr = recv_sock.recvfrom(512)
+            #  used to calculate RTT
+            time_recv = time.time()
             resp_addr = resp_addr[0]
-            print (resp_addr)
         except socket.error:
             pass
+        print (resp_addr)
+        print (resp_data)
+        print (''.join(format(ord(x), 'b') for x in resp_data))
+        #  TODO: read the response datagram and get remaining ttl
+        #  don't know why this section is the header and not the beginning  
+        icmp_header = resp_data[20:28]
+        type, code, checksum, p_id, sequence = unpack('bbHHh', icmp_header)
+        print ("RTT: " + str((time_recv - time_sent) * 1000) + "msec")
+        print ("ICMP type: " + str(type))
+        print ("ICMP code: " + str(code))
+        #  the data of the icmp
+        icmp_data = resp_data[28:]
+        print ("ICMP body length: " + str(len(icmp_data)))
+
 
 
 if __name__ == '__main__':
