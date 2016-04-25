@@ -43,16 +43,20 @@ def main():
         print ("Destination: " + dest_name + " " + dest_addr)
 
         #  used later to calculate RTT
-        time_sent = time.time()
+        time_sent = time.clock()
+        print ("start: " + str(time_sent))
         send_sock.sendto("", (dest_name, port))
 
         try:
             resp_data, resp_addr = recv_sock.recvfrom(512)
-            #  used to calculate RTT
-            time_recv = time.time()
+
             resp_addr = resp_addr[0]
         except socket.error:
             pass
+        #  used to calculate RTT
+        time_recv = time.clock()
+        print("end: " + str(time_recv))
+
         print (resp_addr)
 
         icmp_header = resp_data[20:28]
@@ -64,8 +68,9 @@ def main():
         print ("ICMP body length: " + str(len(icmp_body)) + " bytes")
         ip_ttl = unpack('b', icmp_body[8])
         ip_ttl = int(str(ip_ttl).strip("(), "))
-        print ("Datagram TTL: " + str(ip_ttl))
         print ("TTL difference: " + str(ttl - ip_ttl))
+
+    print (output_barrier + "\n")
 
 
 if __name__ == '__main__':
