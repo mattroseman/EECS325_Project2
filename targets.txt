@@ -3,3 +3,8 @@ google.com
 reddit.com
 stallman.org
 pixelation.org
+facebook.com
+stackoverflow.com
+tools.ietf.org
+archlinux.org
+mit.edu

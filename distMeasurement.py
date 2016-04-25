@@ -57,8 +57,6 @@ def main():
         time_recv = time.clock()
         print("end: " + str(time_recv))
 
-        print (resp_addr)
-
         icmp_header = resp_data[20:28]
         type, code, checksum, p_id, sequence = unpack('bbHHh', icmp_header)
         print ("RTT: " + str(round((time_recv - time_sent) * 10000, 2)) + " msec")
