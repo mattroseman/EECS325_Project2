@@ -30,6 +30,11 @@ def main():
     recv_sock.settimeout(2);
     recv_sock.bind(("", port))
 
+    #  generate 1480 bytes of data
+    #  11 * 134 = 1474
+    #  1474 + 6 = 1480
+    data = ("Hello World" * 134) + "--matt"
+
     targets = open('targets.txt', 'r')
 
     #  read every target from the file targets
@@ -45,7 +50,7 @@ def main():
         #  used later to calculate RTT
         time_sent = time.clock()
         print ("start: " + str(time_sent))
-        send_sock.sendto("", (dest_name, port))
+        send_sock.sendto(data, (dest_name, port))
 
         try:
             resp_data, resp_addr = recv_sock.recvfrom(512)
