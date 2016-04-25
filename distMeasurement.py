@@ -11,9 +11,9 @@ Code stolen from:
 import socket, sys, time
 from struct import *
 
-ICMP_ECHO_REQUEST = 8
-
 def main():
+
+    output_barrier = "----------------------------------------"
 
     udp = socket.getprotobyname('udp')
     icmp = socket.getprotobyname('icmp')
@@ -21,7 +21,8 @@ def main():
     port = 33434
 
     #  create the sending socket (udp packets)
-    send_sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
+    send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, udp)
+    send_sock.setsockopt(socket.SOL_IP, socket.IP_TTL, ttl)
 
     #  create the receiving socket (icmp packets)
     recv_sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
@@ -33,14 +34,15 @@ def main():
 
     #  read every target from the file targets
     for dest_name in targets:
+
+        print (output_barrier)
+
         #  remove the newline character
         dest_name = dest_name.rstrip()
-        print (dest_name)
         dest_addr = socket.gethostbyname(dest_name)
-        print (dest_addr)
+        print ("Destination: " + dest_name + " " + dest_addr)
 
         #  used later to calculate RTT
-        packet = create_packet()
         time_sent = time.time()
         send_sock.sendto("", (dest_name, port))
 
@@ -52,61 +54,18 @@ def main():
         except socket.error:
             pass
         print (resp_addr)
-        print (resp_data)
-        print (''.join(format(ord(x), 'b') for x in resp_data))
-        #  TODO: read the response datagram and get remaining ttl
-        #  don't know why this section is the header and not the beginning  
+
         icmp_header = resp_data[20:28]
         type, code, checksum, p_id, sequence = unpack('bbHHh', icmp_header)
-        print ("RTT: " + str((time_recv - time_sent) * 1000) + "msec")
-        print ("ICMP type: " + str(type))
-        print ("ICMP code: " + str(code))
+        print ("RTT: " + str(round((time_recv - time_sent) * 10000, 2)) + " msec")
+
         #  the data of the icmp
         icmp_body = resp_data[28:]
-        print ("ICMP body length: " + str(len(icmp_body)))
+        print ("ICMP body length: " + str(len(icmp_body)) + " bytes")
         ip_ttl = unpack('b', icmp_body[8])
+        ip_ttl = int(str(ip_ttl).strip("(), "))
         print ("Datagram TTL: " + str(ip_ttl))
-
-
-def create_packet(self):
-    """
-    Creates a new ICMP packet
-    @return: returns the ICMP packet
-    Code gotten from https://gist.github.com/pklaus/856268
-    """
-    #TODO change this
-    id = 100
-    header = pack('bbHHh', ICMP_ECHO_REQUEST, 0, 0, id, 1)
-    data = "Hello World" * 100
-    packet_checksum = checksum(header + data)
-    header = pack('bbHHh', ICMP_ECHO_REQUEST, 0, socket.htons(packet_checksum),
-                  id, 1)
-    return header + data
-
-def checksum(self, source_string):
-    """
-    Calculates the checksum of src
-    @param: source_string the data to be checked
-    @return: returns this checksum
-    Code gotten from https://gist.github.com/pklaus/856268
-    """
-    sum = 0
-    count_to = (len(source_string) / 2) * 2
-    count = 0
-    while count < count_to:
-        this_val = ord(source_string[count + 1])*256+ord(source_string[count])
-        sum = sum + this_val
-        sum = sum & 0xffffffff
-        count = count + 2
-    if count_to < len(source_string):
-        sum = sum + ord(source_string[len(source_string) - 1])
-        sum = sum & 0xffffffff
-    sum = (sum >> 16) + (sum & 0xffff)
-    sum = sum + (sum >> 16)
-    answer = ~sum
-    answer = answer & 0xffff
-    answer = answer >> 8 | (answer << 8 & 0xff00)
-    return answer
+        print ("TTL difference: " + str(ttl - ip_ttl))
 
 
 if __name__ == '__main__':

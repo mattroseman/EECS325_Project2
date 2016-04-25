@@ -1,2 +1,5 @@
 case.edu
 google.com
+reddit.com
+stallman.org
+pixelation.org
