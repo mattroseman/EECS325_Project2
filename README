@@ -1,0 +1,8 @@
+Author: Matthew Roseman
+Network ID: mrr77
+Email: mrr77@case.edu
+
+Sources: https://blogs.oracle.com/ksplice/entry/learning_by_doing_writing_your
+
+"sudo python distMeasurement.py" is the command to run it
+the code is written and tested with python2.7 and I'm pretty sure it won't work with python3

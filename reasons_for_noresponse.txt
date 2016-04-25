@@ -1,0 +1,7 @@
+-packet is dropped
+-firewall stops udp packets on the port I'm using
+-destination host somehow doesn't sent ICMP response
+-ICMP response is dropped
+-destination is more than 32 hops away
+-the packet takes longer than 2 seconds to go and come back
+-some router along the way doesn't forward
